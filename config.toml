@@ -1,0 +1,25 @@
+baseURL = "https://ldoughty.com/"
+enableRobotsTXT = true
+languageCode = "en-us"
+title = "Lee Doughty"
+author = "Lee Doughty"
+canonifyurls = true
+#paginate = 3
+theme = "silhouette-vtlee"
+uglyurls = false
+
+pygmentsUseClasses=true
+
+#disqusShortname = ""
+#googleAnalytics = ""
+
+[Params]
+author = "Lee Doughty"
+introDescription = "I'm Lee Doughty, Senior Cloud Systems Engineer at the Virginia Cyber Range and all-around geek for 20+ years."
+copyrightBy = "Lee Doughty"
+copyrightLongNotice = "Articles, Text, and Images are Copyright © 2018–2019 by Lee Doughty."
+
+#twitterLink = "https://twitter.com/leemdoughty"
+#instagramLink = ""
+linkedInLink = "https://www.linkedin.com/in/ldoughty"
+rssFeed = true
