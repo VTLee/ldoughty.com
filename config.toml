@@ -13,6 +13,8 @@ pygmentsUseClasses=true
 #disqusShortname = ""
 #googleAnalytics = ""
 
+
+
 [Params]
 author = "Lee Doughty"
 introDescription = "I'm Lee Doughty, Senior Cloud Systems Engineer at the Virginia Cyber Range and all-around geek for 20+ years."
@@ -23,3 +25,6 @@ copyrightLongNotice = "Articles, Text, and Images are Copyright © 2018–2019 b
 #instagramLink = ""
 linkedInLink = "https://www.linkedin.com/in/ldoughty"
 rssFeed = true
+
+[permalinks]
+  post = "/:year/:month/:title/"
