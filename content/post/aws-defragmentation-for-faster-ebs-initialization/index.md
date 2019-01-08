@@ -1,11 +1,7 @@
 ---
 author: "Lee Doughty"
 date: 2018-12-31
-linktitle: "Defragment (sparsify) AWS Snapshots"
-menu:
-  main:
-    parent: tutorials
-title: "AWC EC2 Defragmentation for Faster EBS Initialization"
+title: "Sparsification of AWS EBS Snapshot for Faster Initialization"
 tags:
   - featured
   - aws
@@ -13,47 +9,43 @@ categories:
   - aws
 ---
 
-**_In short_**: This article will help you make a cleaner, faster snapshot or AMI. This is nearly useless unless you're making AMIs, or making volumes from AMIs/snapshots.
+**_In short_**: This article will help you take an existing snapshot and reduce the initialiation time of dirty snapshots (snapshots that contain large amounts of deleted data) by removing the dirty blocks from your snapshot. Combined with a tool like `fio` or `dd` to read over the disk, your initialization times should be reduced.
 
 <!--more-->
 
 ## Introduction
+One of the interesting parts of my job is maintaining "golden images" for our EC2 fleets. With minor changes and re-imaging over time, we've noticed it took longer and longer to [initializing the volumes](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-initialize.html). The initialization process, as you can see at the link, is an AWS recommendation for servers with workloads that want to pre-warm their drives so future access will have consistant, predictable performance that doesn't exist when you first restore a volume form a snapshot. By going through this process, you front-load the initial ~30ms/file access penalty you will see as EBS looks up the source data and pulls it more locally to your instance.
 
-One of the interesting parts of my job is maintaining "golden images" for our EC2 fleets. With minor changes and re-imaging over time, we've noticed it took longer and longer to initialize the drives and get their peak performance. Essentially, there is some strange disk access/read performance hits that happen here that it seems very few people cover how to address **especially** in regards to bootable volumes. I've not found a perfect solution to this problem yet, but I've made some huge progress on dealing with _"dirty disk"_ snapshots -- where the disk has seen significant use before the snapshot was made.
+Unfortunately, initialization easily takes ~1 min/GB on a t2.medium using General Purpose SSD storage (and the storage class is the controlling factor here). What's worse, this process takes ~1 min/GB _including_ deleted files that may be lingering from _any preceeding snapshot_! There is a bright point though: _If EBS knows the block has never been touched, every, it doesn't get this performance hit_. This means if we can remind EBS which blocks matter, we can decrease initialization times!
+
+I've not found the perfect solution yet, but below I'll show how this process can make significant progress on dealing with these _"dirty disk"_ snapshots. In my experiences with quick `restore -> system update -> snapshot` processes, one of our golden images that had been through this process ~8 times saw a 60% reducion in the initialization time (the `fio` over the disk after bootup).
 
 Before I go further, I should credit [Ian Scofield and Mike Ruiz's](https://aws.amazon.com/blogs/apn/how-to-build-sparse-ebs-volumes-for-fun-and-easy-snapshotting/) AWS Blog post; it was a life-saver for me, and a lot of what I do below owes credit to their posts' technical guidance. I highly encourage reading the blog post for more details on the background, but I will summarize most of the important parts.
 
 ## Overview of the Process/Goal
-For those familiar with old-school "Defragmenting", this process is _along those lines_ but not technically accurate. I like to _call it_ "defragmenting" because the act of doing this process is has a similar affect to that older process (there is even a variant of this that is even closer to defragmentation)... However, in reality, we are technically "sparsifying" the block volume... but who searches google for a phrase like "sparsify AWS EBS volume"? If you knew that was what you were looking for, you probably already knew about this -- though perhaps not if it matters in AWS/EBS, or if it has any benefit in AWS.
-
-Well, obviously, there is a benefit, or this whole blog post is for naught:
+The goal of this entire process is essentially to ensure the EBS volume we write contains **only** files that actually exist, and **drops** any blocks of data that contain lingering file fragments from deleted files. In a physical disk sense, imagine we were to copy files from an old disk to a brand new disk -- the new disk will contain none of the deleted files lingering in the old disk. As described above, these deleted files also impact initialization, so we're going to be able to initialize the entire disk faster!
 
 <p align="center">
 <img src="result.png" /><br/>
 Example result of this process. Credit: <a href="https://aws.amazon.com/blogs/apn/how-to-build-sparse-ebs-volumes-for-fun-and-easy-snapshotting/">Ian Scofield and Mike Ruiz's Blog Post</a></p>
 
-
 ## Getting Started
-
-First, I should warn you: if you try and do any of these steps on your own, keep in mind there can costs associated with this as we're not sticking to free-tier stuff. Don't leave lingering running instances and **especially don't leave a provisioned IOPS EBS volume lying around**! It's also important to know that you can't readily convery a provisioned IOPS disk to a general purpose disk; this is meaningless if you're working from an existing snapshot and you're fine making a snapshot at the end, since the intermediate EBS volumes can all be deleted.
+First, I should warn you: if you try and do any of these steps on your own, keep in mind there are costs associated with this as we're not sticking to free-tier stuff. Don't leave lingering running instances and **especially don't leave a provisioned IOPS EBS volume lying around**! While writing this article, it cost me $1 working with 25GB disks. over ~2-3 hours.
 
 ### Step 1 - Identify the source volume
-This is probably obvious, but there's another important follow-up: Identify the availability zone (AZ) it is located in. EBS volumes cannot be attached to instances in different AZs, so you need to ensure the objects you create in the upcoming steps match the same AZ! If you are transfering more than 100GB of data, it may be beneficial to convert it to a provisioned IOPS disk -- but note that you can't convert it back promptly, so you'll need to delete it when you're done to save on costs
+This is probably obvious, but there's another important follow-up: Identify the Availability Zone (AZ) it is located in. EBS volumes cannot be attached to instances in different AZs, so you need to ensure the objects you create in the upcoming steps match the same AZ! I highly recommend you make a snapshot of your source (if you've not already done so), and create a new Provisioned IOPS disk from the snapshot. My first attempt at this with a 25GB of general purpose storage took far more than my lunch break to complete.
 
 ### Step 2 - Create the target volume
-Create A blank disk/volume of appropriate size in the same AZ as the source volume. Note: I _highly_ recommend making the target disk a Provisioned IOPS disk. While this costs more, it reduces your overall bill as transfer speeds for "general" purpose can be exponentially slower (my first test of 25GB all using general purpose took 3-4 hours). With the 1250 Provisioned IOPS for a 25GB disk, the _whole process_ for 25GB can be done in under 10 minutes and is much less prone to errors from sleeping computers or disconnects -- it can possibly be Spot-instanced as well!
+Create A blank disk/volume of appropriate size in the same AZ as the source volume. Here again I _highly_ recommend making the target disk a Provisioned IOPS disk. While this costs more, it probably will still save you money since it will directly offset how long your instance runs and you're less likely to be interrupted by colleagues or encounter problems. With the 1250 Provisioned IOPS for a 25GB disk, the _whole process_ for 25GB can be done in under 10 minutes and is much less prone to errors from sleeping computers or disconnects -- it can possibly be Spot-instanced as well!
 
 <p align="center">
 <img src="target-volume.png" /><br/>
 </p>
 
-
 ### Step 3 - Make a "Transfer" Instance
 Now we will make a utility instance that will do the file move. This instance must be created in the same AZ as the existing disks, and you need SSH, [Systems Manager](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager.html), or similar access to the machine.
 
-Note: We will destroy this machine when we are done.
-
-My typical setup:
+My typical setup -- which I create on-demand, as a provisioned IOPSs disks cost money even when not in use:
 
 - Instance Type: `C5.large` (2vCPU/4GB, $0.02 for ~15 minutes)
   - Note: The C5 generation has the enhanced networking interfaces (ENI), which is helpful. Other options with ENI are also good choices. You can also consider a class of instances with `d` designation if the provided storage is sufficient.
