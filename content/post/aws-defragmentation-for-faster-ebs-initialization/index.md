@@ -2,6 +2,8 @@
 author: "Lee Doughty"
 date: 2018-12-31
 title: "Sparsification of AWS EBS Snapshot for Faster Initialization"
+aliases:
+  - /post/aws-defragmentation-for-faster-ebs-initialization/
 tags:
   - featured
   - aws
