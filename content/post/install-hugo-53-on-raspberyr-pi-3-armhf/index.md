@@ -16,11 +16,11 @@ categories:
 ## Preparing the System
 I'm going to assume you have Raspberry Pi 3b, or another raspberry pi that uses armv71/armhf architecture. I'm also assuming you use Raspbian, or another OS that can use debian packages.
 
-## Install prerequisite
-There's really only 1 prerequisite I found:
+## Install prerequisites
+I only needed libsass1 on my system, but here are all the dependencies I could find for hugo:
 
 ```
-sudo apt-get install libsass1
+sudo apt-get install libsass1 libc6 libgcc1 libstdc++6
 ```
 
 If your distribution can't download that, you might be able to find a similar package you can install manually like we do in the next step.
@@ -37,6 +37,8 @@ This should leave you with either a broken install, suggesting more packages to 
 
 If you are missing more dependencies, you can try and run the following to resolve them:
 ```
+sudo apt-get install -y (package given by an error message)
+# Try to auto-resolve the issue
 sudo apt install --fix-broken -y
 ```
 

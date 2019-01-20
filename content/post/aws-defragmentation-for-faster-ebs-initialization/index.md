@@ -8,7 +8,7 @@ tags:
   - featured
   - aws
 categories:
-  - aws
+  - aws-articles
 ---
 
 **_In short_**: This article will help you take an existing snapshot and reduce the initialiation time of dirty snapshots (snapshots that contain large amounts of deleted data) by removing the dirty blocks from your snapshot. Combined with a tool like `fio` or `dd` to read over the disk, your initialization times should be reduced.
