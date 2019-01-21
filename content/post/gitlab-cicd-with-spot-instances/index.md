@@ -1,13 +1,12 @@
 ---
 author: "Lee Doughty"
-date: 2018-01-21
+date: 2018-01-20
 title: "GitLab Multi-Runner w/docker-machine and Spot Instances for much cheaper CI/CD"
 tags:
   - featured
   - aws
 categories:
   - aws-articles
-draft: true
 ---
 
 
