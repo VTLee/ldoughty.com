@@ -1,7 +1,7 @@
 ---
 author: "Lee Doughty"
 date: 2018-01-20
-title: "Install Hugo 0.53 on Raspberry Pi 3 B+ armv7/armhf"
+title: "Install Hugo 0.53 on Raspberry Pi 3 B+ armv71/armhf"
 tags:
   - hugo
   - raspberry-pi
