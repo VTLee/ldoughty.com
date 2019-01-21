@@ -16,11 +16,11 @@ categories:
 <!--more-->
 
 ## Introduction
-One of the interesting parts of my job is maintaining "golden images" for our EC2 fleets. With minor changes and re-imaging over time, we've noticed it took longer and longer to [initializing the volumes](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-initialize.html). The initialization process, as you can see at the link, is an AWS recommendation for servers with workloads that want to pre-warm their drives so future access will have consistant, predictable performance that doesn't exist when you first restore a volume form a snapshot. By going through this process, you front-load the initial ~30ms/file access penalty you will see as EBS looks up the source data and pulls it more locally to your instance.
+One of the interesting parts of my job is maintaining "golden images" for our EC2 fleets. With minor changes and re-imaging over time, we've noticed it took longer and longer to [initializing the volumes](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-initialize.html). The initialization process, as you can see at the link, is an AWS recommendation for servers with workloads that want to pre-warm their drives so future access will have consistent, predictable performance that doesn't exist when you first restore a volume form a snapshot. By going through this process, you front-load the initial ~30ms/file access penalty you will see as EBS looks up the source data and pulls it more locally to your instance.
 
-Unfortunately, initialization easily takes ~1 min/GB on a t2.medium using General Purpose SSD storage (and the storage class is the controlling factor here). What's worse, this process takes ~1 min/GB _including_ deleted files that may be lingering from _any preceeding snapshot_! There is a bright point though: _If EBS knows the block has never been touched, every, it doesn't get this performance hit_. This means if we can remind EBS which blocks matter, we can decrease initialization times!
+Unfortunately, initialization easily takes ~1 min/GB on a t2.medium using General Purpose SSD storage (and the storage class is the controlling factor here). What's worse, this process takes ~1 min/GB _including_ deleted files that may be lingering from _any preceding snapshot_! There is a bright point though: _If EBS knows the block has never been touched, every, it doesn't get this performance hit_. This means if we can remind EBS which blocks matter, we can decrease initialization times!
 
-I've not found the perfect solution yet, but below I'll show how this process can make significant progress on dealing with these _"dirty disk"_ snapshots. In my experiences with quick `restore -> system update -> snapshot` processes, one of our golden images that had been through this process ~8 times saw a 60% reducion in the initialization time (the `fio` over the disk after bootup).
+I've not found the perfect solution yet, but below I'll show how this process can make significant progress on dealing with these _"dirty disk"_ snapshots. In my experiences with quick `restore -> system update -> snapshot` processes, one of our golden images that had been through this process ~8 times saw a 60% reduction in the initialization time (the `fio` over the disk after bootup).
 
 Before I go further, I should credit [Ian Scofield and Mike Ruiz's](https://aws.amazon.com/blogs/apn/how-to-build-sparse-ebs-volumes-for-fun-and-easy-snapshotting/) AWS Blog post; it was a life-saver for me, and a lot of what I do below owes credit to their posts' technical guidance. I highly encourage reading the blog post for more details on the background, but I will summarize most of the important parts.
 
@@ -149,9 +149,9 @@ This can take a while, just be patient:
 ### Step 9 - New Snapshots / AMIs
 At this stage, we have a volume that is nearly perfectly set up for AWS to work with -- the only bits written to this volume are those containing files, and no fragments of past files. We can now go to the GUI and make a snapshot (and AMI, if desired) of this volume. When we do this, the snapshot will have the same sparse quality!
 
-This is expecially noticable when you want to initialize your disk. As I showed before, this can be a huge performance gain (especially if your source disk had lots of transient files, like GBs deleted logs or other files!)
+This is especially noticeable when you want to initialize your disk. As I showed before, this can be a huge performance gain (especially if your source disk had lots of transient files, like GBs deleted logs or other files!)
 
-Also note that this is an improvement that is consistant with your disk type -- You don't need provisioned IOPS to see the above improvements... General purpose disks will get the same latency improvements. Provisioned IOPS, if used, will simply further reduce the time (at a cost).
+Also note that this is an improvement that is consistent with your disk type -- You don't need provisioned IOPS to see the above improvements... General purpose disks will get the same latency improvements. Provisioned IOPS, if used, will simply further reduce the time (at a cost).
 
 ### Step 10 - Sample results
 You can do this to verify how much of an improvement this is for you. For the below test, I did nothing fancy -- these are general purpose disks on a basic C4 instance.

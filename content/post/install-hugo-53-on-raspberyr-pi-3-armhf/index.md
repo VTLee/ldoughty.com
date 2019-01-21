@@ -43,6 +43,6 @@ sudo apt install --fix-broken -y
 ```
 
 ## My use Case
-Most people don't want a long story up front -- "Just get to the steps!" -- so here's my story: This website is built with Hugo, and I wanted to run the Hugo dev server and code IDE on my Pi. Hugo, unfortunately, does not publish an armhf package on their GitHub releases page, so I looked around for solutions. The first one I thought was to build it myself, but after a few minutes, I realised that will be annoying extra step.. So another quick search and I found Debian (which Raspbian is based on) _does_ make a Hugo package for armhf! Presto, problem solved, and article made to share!
+Most people don't want a long story up front -- "Just get to the steps!" -- so here's my story: This website is built with Hugo, and I wanted to run the Hugo dev server and code IDE on my Pi. Hugo, unfortunately, does not publish an armhf package on their GitHub releases page, so I looked around for solutions. The first one I thought was to build it myself, but after a few minutes, I realized that will be annoying extra step.. So another quick search and I found Debian (which Raspbian is based on) _does_ make a Hugo package for armhf! Presto, problem solved, and article made to share!
 
 Hope this helps someone!
