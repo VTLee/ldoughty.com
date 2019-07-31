@@ -17,8 +17,7 @@ categories:
 To be clear, everyone's pipelines are a bit different. This may not be your magic bullet, but in a professional team, this probably will still save you 50-80% over always-on servers. When I joined the [Virginia Cyber Range](https://virginiacyberrange.org), we had a single AWS `M4.large` that was responsible for all builds. This CICD node was also built on an AMI that had support included (which we never used) but also cost us extra pennies/hour. When I redid the setup for the first time, which was in a crunch, I quickly swapped us to 2 `C4.large` instances (as 2 concurrent workers), which basically doubled our costs to double our workers. When I had more time to invest in this, I decided I wanted to use GitLab multi-Runner with docker-machine.
 
 <p style="text-align: center">
-<img src="ldoughty-cicd-diagram-spot-instances-with-docker-machine-transparent.png" alt="Overview of resulting CICD system using docker+machine and gitlab multi-runner"/><br/>
-
+<img src="ldoughty-cicd-diagram-spot-instances-with-docker-machine-transparent.png" alt="Overview of resulting CICD system using docker+machine and gitlab multi-runner"/>
 </p>
 
 In the end, we now allow developers to spin up up to 25 concurrent `C5.xlarge` workers and with this configuration we now pay less than we did for a _single_ `M4.large` before!
