@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 echo ${PWD}
-hugo server --baseURL=desktop-pi --bind=0.0.0.0 -EFD --themesDir ~/gitwork/ -t silhouette-hugo
+hugo server --baseURL=$(hostname) --themesDir $(pwd)/../ -t silhouette-hugo --bind=0.0.0.0 -EFD -t silhouette-hugo
 #hugo config

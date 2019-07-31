@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-hugo -DE --baseURL=pi3 --themesDir /share -t silhouette-hugo --cleanDestinationDir
+hugo -DE --baseURL=$(hostname) --themesDir $(pwd)/../ -t silhouette-hugo --cleanDestinationDir
