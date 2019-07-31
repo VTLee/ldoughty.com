@@ -21,10 +21,9 @@ To be clear, everyone's pipelines are a bit different. This may not be your magi
 
 </p>
 
+In the end, we now allow developers to spin up up to 25 concurrent `C5.xlarge` workers and with this configuration we now pay less than we did for a _single_ `M4.large` before!
 
-In the end, we now run up to 5 concurrent `C5.xlarge` workers and now pay less than we did for a _single_ `M4.large` before!
-
-In order to do this, you'll need a lot of AWS permissions -- basically full admin, or the ability to work with your AWS admin to make some IAM policies. You'll also need access to the CI/CD section of your GitLab group or project.
+In order to follow the steps, you'll need to be your AWS admin, or be able to work closely with them to make some IAM policies. You'll also need access to the CI/CD section of your GitLab group or project (which typically meains Maintainer of the GitLab repo or group).
 
 At a minimum, this will cost $4/month, even if entirely unused. So if you're super low-budget, you probably want to find alternatives that can embrace Lambda and API gateway to capture merge requests and spawn workers.
 
