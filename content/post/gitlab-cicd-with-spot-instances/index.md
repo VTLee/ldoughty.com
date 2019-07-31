@@ -9,13 +9,20 @@ categories:
   - aws-articles
 ---
 
-
 **Summary**: This article will hook up GitLab group (or project) runners to AWS Spot Instances through docker-machine, which in my professional experience gave us ~3-4 extra concurrent workers while reducing our cost by ~60%. This is mostly achieved by only spawning CI/CD instances only as they were needed and getting lower Spot instance rates.
 
 <!--more-->
 
 ## Expectation Setting
-To be clear, everyone's pipelines are a bit different. This may not be your magic bullet, but in a professional team, this probably will still save you at least 35%. When I joined the [Virginia Cyber Range](https://virginiacyberrange.org), we had a single `M4.large` that was responsible for all builds. Since it was built on a Red Hat AMI, it also had the marketplace fee. When I redid the setup for the first time, which was in a crunch, I quickly swapped us to 2 `C4.large` instances (as 2 concurrent workers), which basically doubled our costs to double our workers. When I had more time to invest in this, I decided I wanted to use GitLab multi-Runner with docker-machine. In the end, we now run up to 5 concurrent `C5.xlarge` workers and now pay less than we did for a _single_ `M4.large` before!
+To be clear, everyone's pipelines are a bit different. This may not be your magic bullet, but in a professional team, this probably will still save you 50-80% over always-on servers. When I joined the [Virginia Cyber Range](https://virginiacyberrange.org), we had a single AWS `M4.large` that was responsible for all builds. This CICD node was also built on an AMI that had support included (which we never used) but also cost us extra pennies/hour. When I redid the setup for the first time, which was in a crunch, I quickly swapped us to 2 `C4.large` instances (as 2 concurrent workers), which basically doubled our costs to double our workers. When I had more time to invest in this, I decided I wanted to use GitLab multi-Runner with docker-machine.
+
+<p style="text-align: center">
+<img src="ldoughty-cicd-diagram-spot-instances-with-docker-machine-transparent.png" alt="Overview of resulting CICD system using docker+machine and gitlab multi-runner"/><br/>
+
+</p>
+
+
+In the end, we now run up to 5 concurrent `C5.xlarge` workers and now pay less than we did for a _single_ `M4.large` before!
 
 In order to do this, you'll need a lot of AWS permissions -- basically full admin, or the ability to work with your AWS admin to make some IAM policies. You'll also need access to the CI/CD section of your GitLab group or project.
 
