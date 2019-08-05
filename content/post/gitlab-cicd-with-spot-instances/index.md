@@ -109,35 +109,35 @@ check_interval = 0
   name = "ip-xxx-xxx-xxx-xxx" # replace me with the real hostname
   limit = 5
   url = "https://gitlab.myorganization.com/"
-  token = "4035ada..." # get me from the register command
+  token = "4035ada...a05b0c3efcde432" # get me from the register command
   executor = "docker+machine"
   [runners.docker]
     tls_verify = false
     image = "alpine:3.8"
-    privileged = true # If using service: docker:dind
+    privileged = true
     disable_cache = false
     volumes = ["/cache"]
     shm_size = 0
   [runners.cache]
   [runners.machine]
-    IdleCount = 2
-    IdleTime = 1200
+    IdleCount = 1
+    IdleTime = 1800
     MaxBuilds = 5
     MachineDriver = "amazonec2"
     MachineName = "runner-%s"
     MachineOptions = [
         "amazonec2-iam-instance-profile=Gitlab-Runner-Instance-Role",
         "amazonec2-use-private-address=true",
-        "amazonec2-instance-type=c5.xlarge",
+        "amazonec2-instance-type=c5.2xlarge",
         "amazonec2-vpc-id=vpc-32cxxxxxx",
         "amazonec2-subnet-id=subnet-23faxxxxx",
         "amazonec2-root-size=15",
         "amazonec2-request-spot-instance=true",
-        "amazonec2-spot-price=0.10"]
+        "amazonec2-spot-price=0.18"]
     OffPeakPeriods = ["* * 0-7,18-23 * * mon-fri *", "* * * * * sat,sun *"]
     OffPeakTimezone = "America/New_York"
     OffPeakIdleCount = 0
-    OffPeakIdleTime = 900
+    OffPeakIdleTime = 300
 ```
 
 You will really want to look at [the options](https://docs.gitlab.com/runner/configuration/advanced-configuration.html#the-runners-machine-section) available here.
@@ -151,8 +151,8 @@ The most important ones:
 * `MaxBuilds` is how many jobs a machine can do before you recycle it
 * `MachineOptions` is a [giant collection of additional properties](https://docs.gitlab.com/runner/configuration/autoscale.html#what-are-the-supported-cloud-providers) you should investigate, but most of this is clear. The only one that really isn't is the `amazonec2-spot-price` field, which I recommend setting to your on-demand price for the instance type. This will ensure you nearly always can do builds, and never pay more than you would if you ran the server 24/7. Generally, we've seen this alone is 50% cheaper.
 
-From the above config, you can see we set peak hours, M-F 8am-5:59pm Eastern. During business hours we'd keep `IdleCount` workers ready to got always, and we could build _up to_ `concurrent` concurrent workers. If there was a break of non-use, we'd spin back down to a minimum of the `IdleCount` (or `OffPeakIdleCount`). Of course, our developers could still spin up lots of workers after-hours, it's just a bit slower to get rolling.
+From the above config, you can see we set peak hours, M-F 8am-5:59pm Eastern. During business hours we'd keep 1 worker in wait always, and we could build _up to_ 5 concurrent workers. If there was a break of non-use, we'd spin back down to a minimum of 1. After peak, we have no idle workers (which adds ~2 minutes to CICD time), but if one of them did spin up, we'd keep it around for 5 minutes to make staged builds flow into each other with less delay. Of course, our developers could still have up to 5 concurrent builds off-hours, it's just slightly slower, and less forgiving.
 
 
 ## Final Notes
-I hope you found this helpful! Unfortunately, I developed this over several weeks, so if there are any mistakes, drop me a line at leemdoughty (at Gmail) so I can correct them.
+I hope you found this helpful! Unfortunately, I developed this over several weeks, so if there are any mistakes, drop me a line at ldoughty@vt.edu so I can correct them.
