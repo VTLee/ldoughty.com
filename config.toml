@@ -11,7 +11,7 @@ uglyurls = false
 pygmentsUseClasses=true
 
 #disqusShortname = ""
-#googleAnalytics = ""
+googleAnalytics = "UA-46236592-4"
 
 
 
