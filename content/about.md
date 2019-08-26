@@ -2,6 +2,8 @@
 title: "About This Site"
 author: "Lee Doughty"
 date: 2018-12-31
+aliases:
+    - about
 ---
 
 This site was built because I primarily wanted to share some of my findings exploring some deep concepts of cloud computing with the world.

@@ -14,16 +14,22 @@ categories:
 
 ## Pre-requisites
 
-This article assumes you have an AWS account, and are trying to automate building a website through a static site generator.
-
-Notes:
-
 * You will need significant AWS permissions to follow along.
 * You will need a GitHub account (though in theory GitLab should also work)
-* This is not always a completely free service, so you may be billed for the resulting product. My experience: This costs less than $0.05/month to run my website, but costs obviously vary with usage.
+* This is not always a completely free service, so you may be billed for the resulting product. My experience: this costs pennies/month.
 
 ## Introduction
 
-I saw an article on [Hacker News](https://news.ycombinator.com/) about serverless webpages, which was annoying to some readers because the deploy process was not serverless, only the resulting product was serverless. Since you can build Hugo and deploy from your local machine, why set up a CICD server to deploy your website? You're then still paying for a server!
+There can be advantages to off-loading your deployment of your website to an automated serverless CICD pipeline. I personally love the lack of maintenance of this solution, as I can walk away from my website for 1-2 months and I pay nothing for the CICD process. I can also jump right back in with no additional work to reset the CICD setup or re-determine how I build _this_ version of my pipeline (working with pipelines and optimizing things is a portion of my day job).
 
-That said, there can be advantages to offloading this. If you worked on a team, this kind of setup would allow multiple people to branch and merge, and any accepted and merged to master content would be auto-published to your destination.
+If you worked on a team, this kind of setup would allow multiple people to branch and merge, and any accepted and merged to master content would be auto-published to your destination. This is probably not the _best_ solution in this case, unless you further add steps to control staged deployments... However this would get you a _development_ website and the files for deployment.
+
+Here's the rough architecture we're aiming for:
+
+[<img src="github-deploy-architecture-transparent.png" style="max-width:400px;" />](./github-deploy-architecture.png)<br/>
+
+1. A Git server (GitHub in this article, but GitLab should work) accepts a master-branch merge (GitLab calls this a merge request, GitHub calls this a pull request). In either event, a [https://en.wikipedia.org/wiki/Webhook](webhook) is triggered where data is sent to a specified HTTPS endpoint.
+2. API Gateway is this specified endpoint. It takes in a request and forwards the request to the Lambda. While it does this, it maintains the connection to the Git server as well as the Lambda process. The lambda has 29 seconds to complete or the API Gateway will abort the process and return a negative response to the Git webhook. Depending on the size of your website, this may be a concern if you grow to a very large size. If you hit this limit and are curious about next steps, feel free to contact me {{ "about" | absURL }} ({{ "about" | absURL }})
+
+{{ "about" | absURL }}
+{{ "about/" | absURL }}
