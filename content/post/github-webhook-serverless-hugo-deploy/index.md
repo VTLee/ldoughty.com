@@ -26,6 +26,9 @@ If you worked on a team, this kind of setup would allow multiple people to branc
 
 Here's the rough architecture we're aiming for:
 
+![test](github-deploy-architecture-transparent.png)
+
+
 [<img src="github-deploy-architecture-transparent.png" style="max-width:400px;" />](./github-deploy-architecture.png)<br/>
 
 1. A Git server (GitHub in this article, but GitLab should work) accepts a master-branch merge (GitLab calls this a merge request, GitHub calls this a pull request). In either event, a [https://en.wikipedia.org/wiki/Webhook](webhook) is triggered where data is sent to a specified HTTPS endpoint.
