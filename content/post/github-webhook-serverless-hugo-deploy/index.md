@@ -26,13 +26,7 @@ If you worked on a team, this kind of setup would allow multiple people to branc
 
 Here's the rough architecture we're aiming for:
 
-![test](github-deploy-architecture-transparent.png)
-
-
-[<img src="github-deploy-architecture-transparent.png" style="max-width:400px;" />](./github-deploy-architecture.png)<br/>
+![Github to AWS Serverless architecture diagram showing the git webhook passing through API Gateway to Lambda to run custom code that pushes content to S3 and is served by CloudFront](github-deploy-architecture-transparent.png)
 
 1. A Git server (GitHub in this article, but GitLab should work) accepts a master-branch merge (GitLab calls this a merge request, GitHub calls this a pull request). In either event, a [https://en.wikipedia.org/wiki/Webhook](webhook) is triggered where data is sent to a specified HTTPS endpoint.
-2. API Gateway is this specified endpoint. It takes in a request and forwards the request to the Lambda. While it does this, it maintains the connection to the Git server as well as the Lambda process. The lambda has 29 seconds to complete or the API Gateway will abort the process and return a negative response to the Git webhook. Depending on the size of your website, this may be a concern if you grow to a very large size. If you hit this limit and are curious about next steps, feel free to contact me {{ "about" | absURL }} ({{ "about" | absURL }})
-
-{{ "about" | absURL }}
-{{ "about/" | absURL }}
+2. API Gateway is this specified endpoint. It takes in a request and forwards the request to the Lambda. While it does this, it maintains the connection to the Git server as well as the Lambda process. The lambda has 29 seconds to complete or the API Gateway will abort the process and return a negative response to the Git webhook. Depending on the size of your website, this may be a concern if you grow to a very large size. If you hit this limit and are curious about next steps, feel free to [contact me](https://ldoughty.com/about).
