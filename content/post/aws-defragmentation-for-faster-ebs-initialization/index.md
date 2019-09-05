@@ -1,6 +1,7 @@
 ---
 author: "Lee Doughty"
 date: 2018-12-31
+lastmod: 2019-09-05
 title: "Sparsification of AWS EBS Snapshot for Faster Initialization"
 aliases:
   - /post/aws-defragmentation-for-faster-ebs-initialization/
@@ -103,7 +104,7 @@ Now that we're all set up, we can do the fun stuff!
 ```
 dd if=/dev/nvme1n1 of=/tmp/sparse.img bs=512 status=progress
 ```
-This tells `dd` to copy the `/dev/xvdf` disk to an output file('of') of /tmp/sparse.img using a block size of 512. Status=progress informs `dd` we would like updates on the progress as it works.
+This tells `dd` to copy the `/dev/nvme1n1` disk to an output file('of') of /tmp/sparse.img using a block size of 512. Status=progress informs `dd` we would like updates on the progress as it works.
 
 <p align="center">
 <img src="copy-to-local-image.png" /><br/>
@@ -120,7 +121,7 @@ mkdir /loop && mount -o loop,discard,offset=$(parted -s /tmp/sparse.img unit B p
 #### For NTFS disks:
 I've only done one NTFS disk, so I don't have an offset script that I'm positive works. You can try the above offset script in here if you would like, or manually determine it.
 ```
-mount -t ntfs -o loop,discard,offset=1048576 /tmp/sparse.img /loop
+mkdir /loop && mount -t ntfs -o loop,discard,offset=1048576 /tmp/sparse.img /loop
 ```
 
 ### Step 7 - The Magical FS Trim
