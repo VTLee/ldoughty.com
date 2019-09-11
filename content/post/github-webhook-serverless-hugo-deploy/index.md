@@ -1,6 +1,6 @@
 ---
 author: "Lee Doughty"
-date: 2019-08-20
+date: 2019-09-07
 title: "GitHub Webhook triggered Serverless AWS deploy of static Hugo website"
 tags:
   - aws
