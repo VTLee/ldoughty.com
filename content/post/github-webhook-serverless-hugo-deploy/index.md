@@ -1,24 +1,25 @@
 ---
 author: "Lee Doughty"
 date: 2019-09-07
-title: "Webhook triggered Hugo serverless deploy on AWS"
+title: "Static Hugo Serverless Website on AWS updated by Webhook"
 tags:
   - aws
   - hugo
-  - featuredmm
+  - featured
 categories:
   - aws-articles
 ---
 
-**Summary**: This article will go over the basics to do an AWS Lambda deploy to AWS S3 + CloudFront of a Hugo static website after you merge to your master branch in GitHub. As an optional bonus step, you can add E-mail and other notifications when this happens. In theory this is applicable to other static website generators, but most of the article is not portable to other cloud vendors since the processor and target are both AWS.
+**Summary**: This length article covers a large number of services that can get you from a local hugo site to up and running in a serverless, easily-updated website. We will go over the basics to do an AWS Lambda deploy to AWS S3 + CloudFront of a Hugo static website after you merge to your master branch in GitHub (or GitLab). As an optional bonus step, you can add E-mail and other notifications when this happens. In theory this is applicable to other static website generators, but most of the article is not portable to other cloud vendors since the processor and target are both AWS.
 
 <!--more-->
 
 ## Pre-requisites
 
-* You will need significant AWS permissions to follow along.
-* You will need a GitHub account (though in theory GitLab should also work)
-* This is not always a completely free service, so you may be billed for the resulting product. My experience: this costs pennies/month.
+* This article assumes you have an AWS account with sufficient privileges.
+* It is expected you have your website in a git repository.
+* As a more complicated article, some easier steps are glossed over.
+
 
 ## Introduction
 
@@ -57,7 +58,9 @@ Certificate Manager doesn't have a direct role in any of this, but it holds the 
 
 There's not a really great starting point for this article. There's a lot of components involved, and to build this you need to stand up components from the end and work towards the beginning. Certificate Manager is a good low-hanging fruit that needs to be done to support both API Gateway and CloudFront, so let's start there.
 
-Certificate manager is fairly straight-forward. You can probably go to that section and follow the simple process to _Request a Public Certificate_. In leiu of filling this article with very basic screen captures, if you have issues, I'd recommend following the [AWS process](https://docs.aws.amazon.com/acm/latest/userguide/gs-acm-request-public.html)
+Certificate manager is fairly straight-forward. You can probably go to that section and follow the simple process to _Request a Public Certificate_. In leiu of filling this article with very basic screen captures, if you have issues, I'd recommend following the [AWS process](https://docs.aws.amazon.com/acm/latest/userguide/gs-acm-request-public.html) and request a certificate for both `www.yourdomain.com` and `yourdomain.com`. If you have a different subdomain in mind, you're welcome to adjust this as you see fit.
+
+Please start the validation process then return to this article; validation typically is done within 5 minutes if done correctly, but can take hours in some cases.
 
 ## S3 Bucket Setup
 
@@ -65,10 +68,29 @@ This is another easy step. Go to AWS S3 and create a bucket. AWS Buckets must be
 
 ## AWS CloudFront
 
-Cloudfront
+Hopefully your certificate passed validation. Now we can move on to the CloudFront component. We'll want to [create a distribution](https://console.aws.amazon.com/cloudfront/home?region=us-east-1#create-distribution). You'll want to provide the following:
+
+For brevity, if the option should remain in the default state, it is excluded from this:
+
+* `Origin Domain Name` will have a drop down that lets you select the S3 bucket you created
+* `Viewer Protocol Policy` should be set to `Redirect HTTP to HTTPS` to provide the best user experience
+* `Compress Objects Automatically` Set this to Yes. This reduces the file size of data returned to users which is a great benefit for mobile users
+* `Alternate Domain Names (CNAMEs)` should be set to your website domain you want to serve this content out of. It's usually good to have `www.yourdomain.com` and `yourdomain.com` in the list
+* `SSL Certificate` here you should select the certificate you made previously. If it's not validated yet, you might have to return to this section later.
+* `Default Root Object` should be `index.html`
+
+That should be it for now. Your distribution will take 10-15 minutes to set up, so lets move on for now. Before you navigate away from CloudFront, grab the cloudfront.net Domain Name provided.
+
+## Route 53 (or alternate DNS provider)
+
+Go to your DNS provider and add a CNAME record pointing `yourdomain.com` and `www.yourdomain.com` to the CloudFront.net URL you were provided in the last step. If you decided to use a different subdomain, you can obviously use that instead.
 
 ## AWS Lambda
 
+Now we can start on the interesting stuff!
+
+[python code](lambda_function.py.txt)
 
 ## AWS API Gateway
+
 
