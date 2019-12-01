@@ -13,7 +13,8 @@ pygmentsUseClasses=true
 #disqusShortname = ""
 googleAnalytics = "UA-46236592-4"
 
-
+[markup.goldmark.renderer]
+unsafe= true
 
 [Params]
 rssFeed = true
