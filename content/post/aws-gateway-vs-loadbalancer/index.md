@@ -21,7 +21,7 @@ API Gateway, as you are probably aware, is the de facto standard way to invoke a
 
 If you never heard of this, you can be forgiven. This was relatively new -- [introduced during the tail end of AWS re:Invent 2018](https://aws.amazon.com/blogs/networking-and-content-delivery/lambda-functions-as-targets-for-application-load-balancers/). In short: You can use a load balancer and host/path rules to redirect requests to an AWS Lambda back end. Prior to this feature addition, essentially Lambda was only reachable with API Gateway.
 
-## What's the point?
+## What's the point
 
 **Load Balancer integration allows you to have "up to" 50 APIs behind it for a *relatively* fixed cost of $25/month.**
 
