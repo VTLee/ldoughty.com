@@ -3,7 +3,6 @@ author: "Lee Doughty"
 date: 2019-08-15
 title: "Parallel API Gateway Lambda Execution"
 tags:
-  - featured
   - aws
 categories:
   - aws-articles
