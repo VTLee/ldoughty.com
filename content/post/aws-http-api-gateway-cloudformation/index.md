@@ -76,7 +76,17 @@ Resources:
     Properties: 
       LogGroupName: !Join [/,["/aws/lambda", !Ref MyFunction ]]
       RetentionInDays: 5
+
+  LambdaApiGatewayPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !GetAtt [ MyFunction, Arn ]
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${Gateway}/*
 ```
+
+Quick note: Thanks to Colin Dellow @ https://cldellow.com for pointing out this missing `AWS::Lambda::Permission` above!
 
 This is obviously a "Dummy" Script, it will stand up an API that returns Hello. You should plug in your own code by `CodeUri`. It _is_ worth nothing -- if you've never made an API Gateway before -- that the Timeout on your Lambda should be 30 seconds or less. This is a hard limit imposed by AWS, and can't be increased. You should also consider that, if an API is calling another API, a lower timeout might allow you the opportunity to retry if a call hangs/fails.
 
