@@ -86,29 +86,10 @@ Resources:
       SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${Gateway}/*
 ```
 
-Quick note: Thanks to Colin Dellow @ https://cldellow.com for pointing out this missing `AWS::Lambda::Permission` above!
+Quick note: Thanks to Colin Dellow @ https://cldellow.com for pointing out `AWS::Lambda::Permission` can be added to remove a CLI action I was previously recommending!
 
 This is obviously a "Dummy" Script, it will stand up an API that returns Hello. You should plug in your own code by `CodeUri`. It _is_ worth nothing -- if you've never made an API Gateway before -- that the Timeout on your Lambda should be 30 seconds or less. This is a hard limit imposed by AWS, and can't be increased. You should also consider that, if an API is calling another API, a lower timeout might allow you the opportunity to retry if a call hangs/fails.
 
 Anyway, once this CloudFormation is in place, you'll just need to provide an SSL Certificate Arn from Certificate Manager, and it's related domain. CloudFormation will spin up all the objects for you -- assuming you just want a basic, forward-everything default route. Adapt this to your needs!
-
-## Slight bug
-
-I did notice a minor problem with this CloudFormation template, and I'm not sure if it's due to a missing component on my side, or because this service is still in development. I needed to run the following command to give API Gateway permission to execute my lambda:
-
-```sh
-export ACCOUNT_NUMBER=123456789012
-export REGION=us-east-1
-export FUNCTION_NAME=MyFunction
-export GATEWAYID=8r9luwzuag # Get the "ID" value from your API Gateway API Listing page
-aws lambda add-permission \
-  --statement-id AUniqueStatementId \
-  --action lambda:InvokeFunction \
-  --principal apigateway.amazonaws.com \
-  --function-name "arn:aws:lambda:${REGION}:${ACCOUNT_NUMBER}:function:${FUNCTION_NAME}" \
-  --source-arn "arn:aws:execute-api:${REGION}:${ACCOUNT_NUMBER}:${GATEWAYID}/*"
-```
-
-This is a slight variation of the `Integrations` section _"Example policy statement"_ which allows all routes to call the Lambda, not just `$default`, which is seemingly necessary to function. Otherwise I constantly got either of these errors (depending on what configuration was currently in place as I explored this issue): _"{"message":"Internal Server Error"}"_ or _"{"message":"Not Found"}"_
 
 I Hope this helps!
