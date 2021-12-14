@@ -23,7 +23,7 @@ categories:
 
 ## Introduction
 
-There can be advantages to off-loading your deployment of your website to an automated serverless CICD pipeline. I personally love the lack of maintenance of this solution, as I can walk away from my website for 1-2 months and I pay nothing for the CICD process. I can also jump right back in with no additional work to reset the CICD setup or re-determine how I build _this_ version of my pipeline (working with pipelines and optimizing things is a portion of my day job).
+There can be advantages to off-loading your deployment of your website to an automated serverless CICD pipeline. I personally love the lack of maintenance of this solution, as I can walk away from my website for 1, 2, 12 months and I pay nothing for the CICD process. I can also jump right back in with no additional work to reset the CICD setup or re-determine how I build _this_ version of my pipeline (working with pipelines and optimizing things is a portion of my day job).
 
 If you worked on a team, this kind of setup would allow multiple people to branch and merge, and any accepted and merged to master content would be auto-published to your destination. This is probably not the _best_ solution in this case, unless you further add steps to control staged deployments, however this would get you a _development_ website and the files for deployment which you could build on for other deployment stages.
 
@@ -39,7 +39,7 @@ As you can probably tell, this is not an _introductory_ level article. If you're
 
 2. API Gateway is this specified endpoint you plug into a git server webhook. It takes in a request and forwards the request to the Lambda. While it does this, it maintains the connection to the Git server as well as the Lambda process. The lambda has 29 seconds to complete or the API Gateway will abort the process and return a negative response to the Git webhook. Depending on the size of your website, this may be a concern if you grow to a very large size. If you hit this limit and are curious about next steps, feel free to [contact me](https://ldoughty.com/about).
 
-3. The Lambda recieves the request from API Gateway. The code that processes the request is entirely custom. In this process, if the request is a master-branch merge, we will:
+3. The Lambda receives the request from API Gateway. The code that processes the request is entirely custom. In this process, if the request is a master-branch merge, we will:
 
    * use Lambda to download Hugo
    * `git clone` the branch
@@ -58,7 +58,7 @@ Certificate Manager doesn't have a direct role in any of this, but it holds the 
 
 There's not a really great starting point for this article. There's a lot of components involved, and to build this you need to stand up components from the end and work towards the beginning. Certificate Manager is a good low-hanging fruit that needs to be done to support both API Gateway and CloudFront, so let's start there.
 
-Certificate manager is fairly straight-forward. You can probably go to that section and follow the simple process to _Request a Public Certificate_. In leiu of filling this article with very basic screen captures, if you have issues, I'd recommend following the [AWS process](https://docs.aws.amazon.com/acm/latest/userguide/gs-acm-request-public.html) and request a certificate for both `www.yourdomain.com` and `yourdomain.com`. If you have a different subdomain in mind, you're welcome to adjust this as you see fit.
+Certificate manager is fairly straight-forward. You can probably go to that section and follow the simple process to _Request a Public Certificate_. In lieu of filling this article with very basic screen captures, if you have issues, I'd recommend following the [AWS process](https://docs.aws.amazon.com/acm/latest/userguide/gs-acm-request-public.html) and request a certificate for both `www.yourdomain.com` and `yourdomain.com`. If you have a different subdomain in mind, you're welcome to adjust this as you see fit.
 
 Please start the validation process then return to this article; validation typically is done within 5 minutes if done correctly, but can take hours in some cases.
 
