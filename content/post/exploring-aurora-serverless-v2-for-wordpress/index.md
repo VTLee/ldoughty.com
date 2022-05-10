@@ -21,11 +21,11 @@ I've run a few small WordPress instances over the years on AWS. For the most par
 
 [Aurora Serverless V2](https://aws.amazon.com/about-aws/whats-new/2022/04/amazon-aurora-serverless-v2/) was released in April. The pricing page for both MySQL and Postgres compatible Amazon Serverless v2 states on [their pricing page](https://aws.amazon.com/rds/aurora/pricing/) that: 
 
-> In addition to gaining access to v2 features, most Aurora Serverless customers can lower costs by moving to v2 due to a lower starting capacity of 0.5 ACU (vs. 1 ACU in v1), smaller capacity increments of 0.5 ACU (vs. doubling in v1), and up to 15x faster scale down in capacity compared to Aurora Serverless v1. 
+<blockquote>In addition to gaining access to v2 features, most Aurora Serverless customers can lower costs by moving to v2 due to a lower starting capacity of 0.5 ACU (vs. 1 ACU in v1), smaller capacity increments of 0.5 ACU (vs. doubling in v1), and up to 15x faster scale down in capacity compared to Aurora Serverless v1.</blockquote>
 
 This is what initially got me interested in v2 of Serverless; at 0.5 ACU. The promise above was followed with:
 
-> For example, consider a workload that needs 0.5 ACU of capacity and runs for only one hour every day. With Aurora Serverless v2, the database would start up with 0.5 ACU, run for one hour, and then shut down in under a minute. The compute cost for the workload on Aurora Serverless v2 is $0.06 in US East (Ohio) ($0.12/ACU-hour x 0.5 ACU x 1 hour). The same workload would start up with 1 ACU in Aurora Serverless v1, run for one hour, and shut down in another 15 minutes. Overall, for the same workload, the cost of compute in Aurora Serverless v1 is $0.075 ($0.06/ACU-hour x 1 ACU x 1.25 hour).
+<blockquote>For example, consider a workload that needs 0.5 ACU of capacity and runs for only one hour every day. With Aurora Serverless v2, the database would start up with 0.5 ACU, run for one hour, and then shut down in under a minute. The compute cost for the workload on Aurora Serverless v2 is $0.06 in US East (Ohio) ($0.12/ACU-hour x 0.5 ACU x 1 hour). The same workload would start up with 1 ACU in Aurora Serverless v1, run for one hour, and shut down in another 15 minutes. Overall, for the same workload, the cost of compute in Aurora Serverless v1 is $0.075 ($0.06/ACU-hour x 1 ACU x 1.25 hour).</blockquote>
 
 ## The reality
 
