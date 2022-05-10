@@ -243,18 +243,13 @@ a.btn-outline-secondary:hover {
 
 blockquote {
     margin: 0;
+    background: #444;
+    border-radius: 5px;
 }
 
 blockquote p {
     padding: 15px;
-    background: #eee;
+    margin: 10px;
+    background: #888;
     border-radius: 5px;
-}
-
-blockquote p::before {
-    content: '\201C';
-}
-
-blockquote p::after {
-    content: '\201D';
 }
