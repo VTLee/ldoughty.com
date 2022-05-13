@@ -39,7 +39,18 @@ What is the DB even doing to stay at 95+% CPU usage when there's a single databa
 
 Anyways, this makes the minimum cost for a WordPress DB not $43.20 (before the usage costs), but $86.40...
 
+# 2-Day bill (at 0.5  ACU)
+
+<p style="text-align: center">
+<img src="aurorav2-2days.PNG" alt="screen capture of 2 days of Aurora-v2 usage"/>
+</p>
+
+With the bill settled, we can see here that 2 days of usage averaging ~24 ACU ended up costing me a bit over $3, so for $30, we're talking north of ~$40/month as I predicted (since this DB is nearly unusable at the minimum specification).
+
+I normally am a huge supporter of AWS and serverless, but in this case, I can't support Aurora V2 Serverless as a cost-saving measure. I think you'd get better and more reliable service (at the low end) getting a very small RDS instance, db.t3.micro costs ~$12/month, or db.t3.small at $25/month.. while they won't scale up, they will likely give you better performance-per-dollar at the low end.
+
 
 ## Use for Wordpress
 
 I wanted to go further with this, but at $86 to play, I lost any motivation... It's cheaper to go with a t4g.medium RDS instance ($54/month), or Lightsail's DB ($15-60, depending on high-availability and how low a spec you need). Of course, if you're comfotable with it, you can also host the DB alongside your website -- but that puts even more on you to manage.
+
